@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  web:
+    container_name: go-bootstrap
+    build: .
+    ports:
+      - '8000:8000'
+    env_file:
+      - ".env"
+    environment:
+      DEBUG: ${DEBUG}
+  nginx:
+    container_name: bootstrap-nginx
+    image: nginx:mainline-alpine
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./logs:/var/log/nginx
+    depends_on:
+      - web
+  bootstrap_db:
+    image: postgres:alpine3.16
+    ports:
+      - '5432:5432'
+    container_name: bootstrap_db
+    env_file:
+      - ".env"
+    volumes:
+      - ./bootstrap_db:/var/lib/postgresql/data
+
